@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name="booking")
+@Table(name = "bookings")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,19 +16,21 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
     private String pnr;
 
-    @ManyToOne
-    @JoinColumn(name="user_id")
-    private User user;
+    private String passengerName;
 
-    @ManyToOne
-    @JoinColumn(name="flight_id")
-    private Flight flight;
+    private String passengerEmail;
 
     private String seatNumber;
 
     @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus;
+
+    @ManyToOne
+    @JoinColumn(name = "flight_id")
+    private Flight flight;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

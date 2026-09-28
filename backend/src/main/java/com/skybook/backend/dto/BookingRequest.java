@@ -6,12 +6,7 @@ import lombok.Data;
 public class BookingRequest {
 
     private Long flightId;
-
+    private String passengerName;
+    private String passengerEmail;
     private String seatNumber;
-
-    private String firstName;
-
-    private String lastName;
-
-    private Integer age;
 }

@@ -1,44 +1,56 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import api from "../api";
 
 function HomePage() {
+  const [source, setSource] = useState("");
+  const [destination, setDestination] = useState("");
   const [flights, setFlights] = useState([]);
 
-  useEffect(() => {
-    api.get("/flights")
-      .then((res) => setFlights(res.data))
-      .catch((err) => console.log(err));
-  }, []);
+  const searchFlights = async () => {
+    const res = await api.get(
+      `/api/flights/search?source=${source}&destination=${destination}`
+    );
+    setFlights(res.data);
+  };
 
   return (
-    <div
-      style={{
-        background: "#eef6ff",
-        minHeight: "100vh",
-        padding: "30px",
-      }}
-    >
-      <h1>✈ SKYBOOK</h1>
-      <h2>Available Flights</h2>
+    <div style={{ padding: 30 }}>
+      <h1>✈ SkyBook Flight Search</h1>
+
+      <input
+        placeholder="Source"
+        value={source}
+        onChange={(e) => setSource(e.target.value)}
+      />
+
+      <br /><br />
+
+      <input
+        placeholder="Destination"
+        value={destination}
+        onChange={(e) => setDestination(e.target.value)}
+      />
+
+      <br /><br />
+
+      <button onClick={searchFlights}>Search Flights</button>
+
+      <hr />
 
       {flights.map((f) => (
         <div
           key={f.id}
           style={{
-            background: "white",
-            padding: 20,
-            margin: "15px 0",
-            borderRadius: 10,
+            border: "1px solid gray",
+            padding: 15,
+            marginTop: 10,
           }}
         >
-          <h3>{f.flightNumber}</h3>
+          <h3>{f.airline}</h3>
+          <p>{f.flightNumber}</p>
           <p>{f.source} → {f.destination}</p>
           <p>₹ {f.price}</p>
-
-          <Link to={`/seat/${f.id}`}>
-            <button>Book Seat</button>
-          </Link>
+          <p>{f.departureTime} - {f.arrivalTime}</p>
         </div>
       ))}
     </div>

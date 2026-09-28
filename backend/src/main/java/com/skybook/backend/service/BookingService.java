@@ -2,7 +2,8 @@ package com.skybook.backend.service;
 
 import com.skybook.backend.dto.BookingRequest;
 import com.skybook.backend.entity.*;
-import com.skybook.backend.repository.*;
+import com.skybook.backend.repository.BookingRepository;
+import com.skybook.backend.repository.FlightRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,68 +13,27 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BookingService {
 
-    private final FlightRepository flightRepo;
-    private final UserRepository userRepo;
     private final BookingRepository bookingRepo;
-    private final SeatRepository seatRepo;
-    private final PaymentRepository paymentRepo;
-    private final PassengerRepository passengerRepo;
+    private final FlightRepository flightRepo;
 
-    public String bookSeat(BookingRequest request) {
+    public Booking bookFlight(BookingRequest req) {
 
-        Flight flight = flightRepo.findById(request.getFlightId())
-                .orElseThrow();
+        Flight flight = flightRepo.findById(req.getFlightId()).orElseThrow();
 
-        User user = userRepo.findById(1L)
-                .orElseThrow();
-
-        Seat seat = seatRepo
-                .findByFlightIdAndSeatNumber(
-                        request.getFlightId(),
-                        request.getSeatNumber())
-                .orElseThrow();
-
-        if (seat.getBooked()) {
-            return "Seat Already Booked";
-        }
-
-        seat.setBooked(true);
-        seatRepo.save(seat);
-
-        String pnr = "SKB" +
-                UUID.randomUUID()
-                        .toString()
-                        .substring(0,6)
-                        .toUpperCase();
+        String pnr = UUID.randomUUID()
+                .toString()
+                .substring(0,6)
+                .toUpperCase();
 
         Booking booking = Booking.builder()
                 .pnr(pnr)
-                .user(user)
-                .flight(flight)
-                .seatNumber(request.getSeatNumber())
+                .passengerName(req.getPassengerName())
+                .passengerEmail(req.getPassengerEmail())
+                .seatNumber(req.getSeatNumber())
                 .bookingStatus(BookingStatus.CONFIRMED)
+                .flight(flight)
                 .build();
 
-        bookingRepo.save(booking);
-
-        Passenger passenger = Passenger.builder()
-                .booking(booking)
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .age(request.getAge())
-                .build();
-
-        passengerRepo.save(passenger);
-
-        Payment payment = Payment.builder()
-                .booking(booking)
-                .paymentId("PAY" + System.currentTimeMillis())
-                .amount(flight.getPrice())
-                .paymentStatus(PaymentStatus.SUCCESS)
-                .build();
-
-        paymentRepo.save(payment);
-
-        return pnr;
+        return bookingRepo.save(booking);
     }
 }

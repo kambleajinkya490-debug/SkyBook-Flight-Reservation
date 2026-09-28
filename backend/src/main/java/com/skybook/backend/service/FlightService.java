@@ -16,13 +16,13 @@ public class FlightService {
     private final FlightRepository repo;
     private final SeatRepository seatRepo;
 
-    public FlightService(FlightRepository repo,
-                         SeatRepository seatRepo) {
+    public FlightService(FlightRepository repo, SeatRepository seatRepo) {
         this.repo = repo;
         this.seatRepo = seatRepo;
     }
 
-    public Flight addFlight(FlightRequest req){
+    // ADD FLIGHT
+    public Flight addFlight(FlightRequest req) {
 
         Flight flight = Flight.builder()
                 .flightNumber(req.getFlightNumber())
@@ -38,31 +38,50 @@ public class FlightService {
 
         Flight saved = repo.save(flight);
 
-        String[] rows = {"A","B","C","D","E","F"};
+        // Create seats automatically
+        for (int i = 1; i <= req.getTotalSeats(); i++) {
+            Seat seat = Seat.builder()
+                    .seatNumber("A" + i)
+                    .booked(false)
+                    .flight(saved)
+                    .build();
 
-        for(int n=1; n<=30; n++){
-            for(String row: rows){
-                Seat seat = Seat.builder()
-                        .seatNumber(row+n)
-                        .booked(false)
-                        .flight(saved)
-                        .build();
-
-                seatRepo.save(seat);
-            }
+            seatRepo.save(seat);
         }
 
         return saved;
     }
 
-    public List<Flight> getAllFlights(){
+    // GET ALL
+    public List<Flight> getAllFlights() {
         return repo.findAll();
     }
 
-    public List<Flight> search(String source,
-                               String destination,
-                               LocalDate date){
-        return repo.findBySourceAndDestinationAndFlightDate(
-                source,destination,date);
+    // SEARCH
+    public List<Flight> search(String source, String destination) {
+        return repo.findBySourceAndDestination(source, destination);
+    }
+
+    // UPDATE
+    public Flight updateFlight(Long id, Flight updated) {
+
+        Flight flight = repo.findById(id).orElseThrow();
+
+        flight.setFlightNumber(updated.getFlightNumber());
+        flight.setAirline(updated.getAirline());
+        flight.setSource(updated.getSource());
+        flight.setDestination(updated.getDestination());
+        flight.setFlightDate(updated.getFlightDate());
+        flight.setDepartureTime(updated.getDepartureTime());
+        flight.setArrivalTime(updated.getArrivalTime());
+        flight.setPrice(updated.getPrice());
+        flight.setTotalSeats(updated.getTotalSeats());
+
+        return repo.save(flight);
+    }
+
+    // DELETE
+    public void deleteFlight(Long id) {
+        repo.deleteById(id);
     }
 }

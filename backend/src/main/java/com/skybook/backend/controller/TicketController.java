@@ -1,31 +1,29 @@
 package com.skybook.backend.controller;
 
-import com.skybook.backend.dto.TicketResponse;
-import com.skybook.backend.pdf.PdfService;
-import com.skybook.backend.service.TicketService;
+import com.skybook.backend.entity.Booking;
+import com.skybook.backend.repository.BookingRepository;
+import com.skybook.backend.service.PdfService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/tickets")
-@CrossOrigin(origins = "*")
+@CrossOrigin("*")
 @RequiredArgsConstructor
 public class TicketController {
 
-    private final TicketService service;
+    private final BookingRepository bookingRepo;
     private final PdfService pdfService;
 
-    @GetMapping("/{pnr}")
-    public TicketResponse getTicket(@PathVariable String pnr) {
-        return service.getTicket(pnr);
-    }
-
     @GetMapping("/{pnr}/pdf")
-    public ResponseEntity<byte[]> downloadPdf(@PathVariable String pnr) {
+    public ResponseEntity<byte[]> download(@PathVariable String pnr) throws Exception {
 
-        TicketResponse ticket = service.getTicket(pnr);
-        byte[] pdf = pdfService.generate(ticket);
+        Booking booking = bookingRepo.findByPnr(pnr).orElseThrow();
+
+        byte[] pdf = pdfService.generateTicket(booking);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,

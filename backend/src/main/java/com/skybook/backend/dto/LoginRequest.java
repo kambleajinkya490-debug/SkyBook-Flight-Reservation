@@ -1,11 +1,8 @@
 package com.skybook.backend.dto;
 
-import lombok.*;
+import lombok.Data;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class LoginRequest {
 
     private String email;

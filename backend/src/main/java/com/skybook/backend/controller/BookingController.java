@@ -1,20 +1,21 @@
 package com.skybook.backend.controller;
 
 import com.skybook.backend.dto.BookingRequest;
+import com.skybook.backend.entity.Booking;
 import com.skybook.backend.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/flights")
-@CrossOrigin(origins = "*")
+@RequestMapping("/api/bookings")
+@CrossOrigin("*")
 @RequiredArgsConstructor
 public class BookingController {
 
-    private final BookingService service;
+    private final BookingService bookingService;
 
-    @PostMapping("/book-seat")
-    public String bookSeat(@RequestBody BookingRequest request) {
-        return service.bookSeat(request);
+    @PostMapping
+    public Booking createBooking(@RequestBody BookingRequest request){
+        return bookingService.bookFlight(request);
     }
 }
