@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: backend
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: backend
+
+  template:
+    metadata:
+      labels:
+        app: backend
+
+    spec:
+      containers:
+      - name: backend
+        image: skybook-backend:latest
+        imagePullPolicy: Never
+
+        ports:
+        - containerPort: 8081
+
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://postgres:5432/skybook
+
+        - name: SPRING_DATASOURCE_USERNAME
+          value: postgres
+
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: postgres

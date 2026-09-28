@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: frontend
+
+spec:
+  selector:
+    app: frontend
+
+  ports:
+    - port: 5173
+      targetPort: 5173
+      nodePort: 30073
+
+  type: NodePort
