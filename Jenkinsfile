@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        APP_NAME = "skybook-backend"
-    }
-
     stages {
 
         stage('Clone') {
@@ -29,14 +25,21 @@ pipeline {
             }
         }
 
+        stage('Deploy to Minikube') {
+            steps {
+                sh 'minikube image load skybook-backend:latest'
+                sh 'kubectl rollout restart deployment backend'
+                sh 'kubectl rollout status deployment backend'
+            }
+        }
     }
 
     post {
         success {
-            echo 'Build Successful ✅'
+            echo 'CI/CD SUCCESS 🚀'
         }
         failure {
-            echo 'Build Failed ❌'
+            echo 'Pipeline Failed ❌'
         }
     }
 }
