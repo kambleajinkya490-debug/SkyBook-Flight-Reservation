@@ -19,6 +19,8 @@ repositories {
 
 dependencies {
 
+    implementation 'com.itextpdf:itext7-core:8.0.5'
+    implementation 'com.google.zxing:core:3.5.3'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.google.zxing:core:3.5.3'
     implementation 'com.google.zxing:javase:3.5.3'   

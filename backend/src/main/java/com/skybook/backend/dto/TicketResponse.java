@@ -1,11 +1,9 @@
 package com.skybook.backend.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @Builder
 public class TicketResponse {
 
@@ -15,11 +13,10 @@ public class TicketResponse {
     private String route;
     private String seat;
 
+    private String gate;
+    private String terminal;
+    private String boardingTime;
+
     private String bookingStatus;
     private String paymentStatus;
-
-    // NEW
-    private String gate;
-    private String boardingTime;
-    private String terminal;
 }
