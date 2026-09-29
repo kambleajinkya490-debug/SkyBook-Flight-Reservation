@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import RegisterPage from "./pages/RegisterPage";
+import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import AdminPage from "./pages/AdminPage";
 import SeatPage from "./pages/SeatPage";
@@ -9,6 +11,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+ 
+        <Route path="/register" element={<RegisterPage />} />          
+
+        <Route path="/login" element={<LoginPage />} />
 
         {/* Customer Flight Search */}
         <Route path="/" element={<HomePage />} />

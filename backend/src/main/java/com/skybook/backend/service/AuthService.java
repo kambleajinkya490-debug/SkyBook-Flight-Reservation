@@ -20,6 +20,10 @@ public class AuthService {
     // REGISTER
     public String register(RegisterRequest req) {
 
+        if (userRepo.findByEmail(req.getEmail()).isPresent()) {
+            return "Email Already Registered";
+        }
+
         User user = User.builder()
                 .fullName(req.getFullName())
                 .email(req.getEmail())
@@ -29,21 +33,21 @@ public class AuthService {
                 .build();
 
         userRepo.save(user);
+
         return "User Registered Successfully";
     }
 
     // LOGIN
-public String login(LoginRequest req) {
+    public String login(LoginRequest req) {
 
-    User user = userRepo.findByEmail(req.getEmail())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepo.findByEmail(req.getEmail())
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
 
-    System.out.println("DB Password = " + user.getPassword());
+        if (!encoder.matches(req.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
 
-    if (!encoder.matches(req.getPassword(), user.getPassword())) {
-        throw new RuntimeException("Invalid password");
-    }
-
-    return "LOGIN_SUCCESS";
+        return jwtService.generateToken(user.getEmail());
     }
 }

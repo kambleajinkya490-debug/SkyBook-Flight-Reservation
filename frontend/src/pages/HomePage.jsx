@@ -9,7 +9,20 @@ function HomePage() {
 
   const navigate = useNavigate();
 
+  const token = localStorage.getItem("token");
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    alert("Logged out successfully!");
+    navigate("/login");
+  };
+
   const searchFlights = async () => {
+    if (!source || !destination) {
+      alert("Please enter source and destination");
+      return;
+    }
+
     try {
       const res = await api.get(
         `/api/flights/search?source=${source}&destination=${destination}`
@@ -17,42 +30,92 @@ function HomePage() {
 
       setFlights(res.data);
     } catch (error) {
-      console.error(error);
+      console.error("Search error:", error);
       alert("Unable to search flights");
     }
   };
 
   return (
     <div style={{ padding: 30 }}>
+
+      {/* Authentication Buttons */}
+      <div style={{ marginBottom: 20 }}>
+
+        {token ? (
+          <button
+            onClick={logout}
+            style={{
+              padding: "10px 20px",
+              cursor: "pointer",
+            }}
+          >
+            🚪 Logout
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate("/login")}
+            style={{
+              padding: "10px 20px",
+              cursor: "pointer",
+            }}
+          >
+            🔐 Login
+          </button>
+        )}
+
+      </div>
+
       <h1>✈ SkyBook Flight Search</h1>
 
-      <input
-        placeholder="Source"
-        value={source}
-        onChange={(e) => setSource(e.target.value)}
-      />
+      {/* Search Section */}
 
-      <br /><br />
+      <div style={{ marginTop: 20 }}>
 
-      <input
-        placeholder="Destination"
-        value={destination}
-        onChange={(e) => setDestination(e.target.value)}
-      />
+        <input
+          type="text"
+          placeholder="Source"
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
+          style={{
+            padding: 10,
+            width: 250,
+            marginRight: 10,
+          }}
+        />
 
-      <br /><br />
+        <input
+          type="text"
+          placeholder="Destination"
+          value={destination}
+          onChange={(e) => setDestination(e.target.value)}
+          style={{
+            padding: 10,
+            width: 250,
+            marginRight: 10,
+          }}
+        />
 
-      <button onClick={searchFlights}>
-        Search Flights
-      </button>
+        <button
+          onClick={searchFlights}
+          style={{
+            padding: "10px 20px",
+            cursor: "pointer",
+          }}
+        >
+          Search Flights
+        </button>
 
-      <hr />
+      </div>
+
+      <hr style={{ marginTop: 30 }} />
 
       <h2>Available Flights</h2>
 
       {flights.length === 0 && (
         <p>No flights found. Search for a route.</p>
       )}
+
+      {/* Flight List */}
 
       {flights.map((f) => (
         <div
@@ -65,6 +128,7 @@ function HomePage() {
             borderRadius: 10,
           }}
         >
+
           <h3>✈ {f.airline}</h3>
 
           <p>
@@ -80,7 +144,11 @@ function HomePage() {
           </p>
 
           <p>
-            <b>Time:</b> {f.departureTime} - {f.arrivalTime}
+            <b>Departure:</b> {f.departureTime}
+          </p>
+
+          <p>
+            <b>Arrival:</b> {f.arrivalTime}
           </p>
 
           <button
@@ -90,10 +158,12 @@ function HomePage() {
               cursor: "pointer",
             }}
           >
-            Book Flight
+            🪑 Book Flight
           </button>
+
         </div>
       ))}
+
     </div>
   );
 }
