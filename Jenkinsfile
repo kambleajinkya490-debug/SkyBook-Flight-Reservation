@@ -41,20 +41,18 @@ pipeline {
             }
         }
 
-        stage('Deploy to Minikube') {
-            steps {
-                sh '''
-                    ssh -o StrictHostKeyChecking=no ubuntu@13.233.118.205 "
-                        minikube image load skybook-backend:latest &&
-                        minikube image load skybook-frontend:latest &&
-                        kubectl rollout restart deployment backend &&
-                        kubectl rollout restart deployment frontend &&
-                        kubectl rollout status deployment backend &&
-                        kubectl rollout status deployment frontend
-                    "
-                '''
-            }
-        }
+stage('Deploy to Minikube') {
+    steps {
+        sh '''
+            ssh -o StrictHostKeyChecking=no ubuntu@13.233.118.205 "
+                kubectl rollout restart deployment backend &&
+                kubectl rollout restart deployment frontend &&
+                kubectl rollout status deployment backend &&
+                kubectl rollout status deployment frontend
+            "
+        '''
+    }
+}
     }
 
     post {
