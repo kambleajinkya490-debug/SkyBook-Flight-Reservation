@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../api";
 
@@ -6,11 +6,23 @@ function SeatPage() {
   const { flightId } = useParams();
   const navigate = useNavigate();
 
+  const [seats, setSeats] = useState([]);
   const [selected, setSelected] = useState("");
   const [passengerName, setPassengerName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const seats = Array.from({ length: 30 }, (_, i) => i + 1);
+  // Load seats from backend
+  useEffect(() => {
+    api
+      .get(`/api/flights/${flightId}/seats`)
+      .then((response) => {
+        setSeats(response.data);
+      })
+      .catch((error) => {
+        console.error("Seat loading error:", error);
+        alert("Unable to load seats");
+      });
+  }, [flightId]);
 
   const bookFlight = async () => {
     if (!selected) {
@@ -53,6 +65,22 @@ function SeatPage() {
     <div style={{ padding: 30 }}>
       <h1>🪑 Select Your Seat</h1>
 
+      {/* Seat Legend */}
+      <div style={{ marginBottom: 20 }}>
+        <span style={{ marginRight: 20 }}>
+          ⚪ Available
+        </span>
+
+        <span style={{ marginRight: 20 }}>
+          🟢 Selected
+        </span>
+
+        <span>
+          🔵 Booked
+        </span>
+      </div>
+
+      {/* Seats */}
       <div
         style={{
           display: "grid",
@@ -62,18 +90,26 @@ function SeatPage() {
       >
         {seats.map((seat) => (
           <button
-            key={seat}
-            onClick={() => setSelected(seat)}
+            key={seat.id}
+            disabled={seat.booked}
+            onClick={() => setSelected(seat.seatNumber)}
             style={{
               height: 50,
-              background:
-                selected === seat ? "#22c55e" : "#e5e7eb",
               border: "none",
               borderRadius: 8,
-              cursor: "pointer",
+              cursor: seat.booked ? "not-allowed" : "pointer",
+
+              background: seat.booked
+                ? "#2563eb"
+                : selected === seat.seatNumber
+                ? "#22c55e"
+                : "#e5e7eb",
+
+              color: seat.booked ? "white" : "black",
+              fontWeight: "bold",
             }}
           >
-            {seat}
+            {seat.seatNumber}
           </button>
         ))}
       </div>
@@ -82,6 +118,7 @@ function SeatPage() {
         Selected Seat: {selected || "None"}
       </h2>
 
+      {/* Passenger */}
       <div style={{ marginTop: 30 }}>
         <h2>Passenger Details</h2>
 
