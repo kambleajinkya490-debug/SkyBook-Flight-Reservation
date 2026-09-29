@@ -29,14 +29,18 @@ function SeatPage() {
       const response = await api.post("/api/bookings", {
         flightId: Number(flightId),
         passengerName: passengerName,
-        seatNumber: String(selected)
+        seatNumber: String(selected),
       });
 
       console.log("Booking Response:", response.data);
 
       alert("Flight booked successfully!");
 
-      navigate("/success");
+      navigate("/success", {
+        state: {
+          pnr: response.data.pnr,
+        },
+      });
     } catch (error) {
       console.error("Booking Error:", error);
       alert("Booking failed");
