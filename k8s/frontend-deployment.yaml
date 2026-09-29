@@ -19,12 +19,14 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: skybook-frontend:latest
-        imagePullPolicy: Never
+
+        image: 060516714221.dkr.ecr.ap-south-1.amazonaws.com/skybook-frontend:latest
+
+        imagePullPolicy: Always
 
         ports:
         - containerPort: 5173
 
         env:
         - name: VITE_API_URL
-          value: http://13.233.118.205:8081
+          value: http://k8s-default-skybooki-5e5ac147ea-1747448855.ap-south-1.elb.amazonaws.com

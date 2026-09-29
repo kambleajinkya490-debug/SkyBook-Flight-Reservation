@@ -25,3 +25,9 @@ variable "instance_type" {
 variable "key_name" {
   default = "bookmyshow-key"
 }
+
+variable "db_password" {
+  description = "Password for SkyBook RDS PostgreSQL"
+  type        = string
+  sensitive   = true
+}

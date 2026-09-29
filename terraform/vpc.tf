@@ -16,6 +16,7 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
+
 resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.skybook.id
   cidr_block              = var.public_subnet_cidr
@@ -23,9 +24,12 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "Public-Subnet"
+    Name                                = "Public-Subnet"
+    "kubernetes.io/role/elb"            = "1"
+    "kubernetes.io/cluster/SkyBook-EKS" = "shared"
   }
 }
+
 
 resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.skybook.id
@@ -33,9 +37,12 @@ resource "aws_subnet" "private" {
   availability_zone = "ap-south-1b"
 
   tags = {
-    Name = "Private-Subnet"
+    Name                                = "Private-Subnet"
+    "kubernetes.io/role/internal-elb"   = "1"
+    "kubernetes.io/cluster/SkyBook-EKS" = "shared"
   }
 }
+
 
 resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.skybook.id
@@ -50,9 +57,8 @@ resource "aws_route_table" "public_rt" {
   }
 }
 
+
 resource "aws_route_table_association" "public_assoc" {
   subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.public_rt.id
 }
-
-

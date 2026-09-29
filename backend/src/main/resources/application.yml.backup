@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/skybook
+    username: skybook_user
+    password: SkyBook@123
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+
+server:
+  port: 8081

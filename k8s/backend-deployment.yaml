@@ -19,18 +19,20 @@ spec:
     spec:
       containers:
       - name: backend
-        image: skybook-backend:latest
-        imagePullPolicy: Never
+
+        image: 060516714221.dkr.ecr.ap-south-1.amazonaws.com/skybook-backend:latest
+
+        imagePullPolicy: Always
 
         ports:
         - containerPort: 8081
 
         env:
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:postgresql://postgres:5432/skybook
+          value: jdbc:postgresql://skybook-postgres.c1cmgsoamaty.ap-south-1.rds.amazonaws.com:5432/skybook
 
         - name: SPRING_DATASOURCE_USERNAME
-          value: postgres
+          value: skybookadmin
 
         - name: SPRING_DATASOURCE_PASSWORD
-          value: postgres
+          value: SkyBookDB2026Secure

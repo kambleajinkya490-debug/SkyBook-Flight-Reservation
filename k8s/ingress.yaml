@@ -3,20 +3,17 @@ kind: Ingress
 
 metadata:
   name: skybook-ingress
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
 
 spec:
-  ingressClassName: nginx
+  ingressClassName: alb
 
   rules:
   - http:
       paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: frontend
-            port:
-              number: 5173
 
       - path: /api
         pathType: Prefix
@@ -25,3 +22,11 @@ spec:
             name: backend
             port:
               number: 8081
+
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 5173
