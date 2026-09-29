@@ -27,4 +27,4 @@ spec:
 
         env:
         - name: VITE_API_URL
-          value: http://backend:8081
+          value: http://13.233.118.205:8081
