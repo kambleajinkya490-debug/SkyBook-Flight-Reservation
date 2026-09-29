@@ -25,11 +25,23 @@ pipeline {
             }
         }
 
+        stage('Transfer Image to DevOps Server') {
+            steps {
+                sh '''
+                    docker save skybook-backend:latest | gzip | ssh -o StrictHostKeyChecking=no ubuntu@13.233.118.205 'gunzip | docker load'
+                '''
+            }
+        }
+
         stage('Deploy to Minikube') {
             steps {
-                sh 'minikube image load skybook-backend:latest'
-                sh 'kubectl rollout restart deployment backend'
-                sh 'kubectl rollout status deployment backend'
+                sh '''
+                    ssh -o StrictHostKeyChecking=no ubuntu@13.233.118.205 "
+                        minikube image load skybook-backend:latest &&
+                        kubectl rollout restart deployment backend &&
+                        kubectl rollout status deployment backend
+                    "
+                '''
             }
         }
     }
@@ -38,6 +50,7 @@ pipeline {
         success {
             echo 'CI/CD SUCCESS 🚀'
         }
+
         failure {
             echo 'Pipeline Failed ❌'
         }
