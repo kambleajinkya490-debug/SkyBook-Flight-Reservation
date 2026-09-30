@@ -1,4 +1,4 @@
-kyBook – Flight Reservation System
+SkyBook – Flight Reservation System
 
 A cloud-native Flight Reservation System built with React, Spring Boot, PostgreSQL, Docker, Kubernetes, AWS, Jenkins, SonarQube, Trivy, Prometheus, and Grafana.
 
