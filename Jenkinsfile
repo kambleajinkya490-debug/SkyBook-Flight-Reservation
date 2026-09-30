@@ -3,10 +3,8 @@ pipeline {
 
     environment {
         AWS_REGION = 'ap-south-1'
-
         ECR_BACKEND = '060516714221.dkr.ecr.ap-south-1.amazonaws.com/skybook-backend'
         ECR_FRONTEND = '060516714221.dkr.ecr.ap-south-1.amazonaws.com/skybook-frontend'
-
         EKS_CLUSTER = 'SkyBook-EKS'
     }
 
@@ -41,14 +39,23 @@ pipeline {
                             -Dsonar.projectKey=SkyBook \
                             -Dsonar.projectName="SkyBook Flight Reservation" \
                             -Dsonar.sources=backend/src,frontend/src \
-                            -Dsonar.sourceEncoding=UTF-8
+                            -Dsonar.sourceEncoding=UTF-8 \
+                            -Dsonar.java.binaries=backend/build/classes/java/main
                         """
                     }
                 }
             }
         }
 
-        stage('Docker Login to ECR') {
+        stage('Trivy File System Scan') {
+            steps {
+                sh '''
+                    trivy fs --severity HIGH,CRITICAL --exit-code 1 .
+                '''
+            }
+        }
+
+        stage('Docker Login') {
             steps {
                 sh '''
                     aws ecr get-login-password --region $AWS_REGION | \
@@ -62,9 +69,7 @@ pipeline {
         stage('Build Backend Docker Image') {
             steps {
                 sh '''
-                    docker build \
-                    -t $ECR_BACKEND:latest \
-                    ./backend
+                    docker build -t $ECR_BACKEND:latest ./backend
                 '''
             }
         }
@@ -72,14 +77,28 @@ pipeline {
         stage('Build Frontend Docker Image') {
             steps {
                 sh '''
-                    docker build \
-                    -t $ECR_FRONTEND:latest \
-                    ./frontend
+                    docker build -t $ECR_FRONTEND:latest ./frontend
                 '''
             }
         }
 
-        stage('Push Backend to ECR') {
+        stage('Trivy Backend Image Scan') {
+            steps {
+                sh '''
+                    trivy image --severity HIGH,CRITICAL --exit-code 1 $ECR_BACKEND:latest
+                '''
+            }
+        }
+
+        stage('Trivy Frontend Image Scan') {
+            steps {
+                sh '''
+                    trivy image --severity HIGH,CRITICAL --exit-code 1 $ECR_FRONTEND:latest
+                '''
+            }
+        }
+
+        stage('Push Backend') {
             steps {
                 sh '''
                     docker push $ECR_BACKEND:latest
@@ -87,7 +106,7 @@ pipeline {
             }
         }
 
-        stage('Push Frontend to ECR') {
+        stage('Push Frontend') {
             steps {
                 sh '''
                     docker push $ECR_FRONTEND:latest
@@ -112,9 +131,7 @@ pipeline {
                 sh '''
                     kubectl apply -f k8s/backend-deployment.yaml
                     kubectl apply -f k8s/backend-service.yaml
-
                     kubectl rollout restart deployment/backend
-
                     kubectl rollout status deployment/backend --timeout=180s
                 '''
             }
@@ -125,9 +142,7 @@ pipeline {
                 sh '''
                     kubectl apply -f k8s/frontend-deployment.yaml
                     kubectl apply -f k8s/frontend-service.yaml
-
                     kubectl rollout restart deployment/frontend
-
                     kubectl rollout status deployment/frontend --timeout=180s
                 '''
             }
@@ -136,13 +151,8 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 sh '''
-                    echo "===== PODS ====="
                     kubectl get pods
-
-                    echo "===== SERVICES ====="
                     kubectl get services
-
-                    echo "===== INGRESS ====="
                     kubectl get ingress
                 '''
             }
@@ -150,30 +160,12 @@ pipeline {
     }
 
     post {
-
         success {
-            echo '''
-            ==========================================
-              SKYBOOK DEVSECOPS PIPELINE SUCCESS 🚀
-            ==========================================
-              Backend Build        ✅
-              SonarQube Analysis   ✅
-              Docker Build         ✅
-              ECR Push             ✅
-              EKS Deployment       ✅
-              Deployment Verify    ✅
-            ==========================================
-            '''
+            echo 'SKYBOOK DEVSECOPS PIPELINE SUCCESS'
         }
 
         failure {
-            echo '''
-            ==========================================
-              SKYBOOK PIPELINE FAILED ❌
-            ==========================================
-              Check Jenkins Console Output
-            ==========================================
-            '''
+            echo 'SKYBOOK PIPELINE FAILED'
         }
     }
 }
