@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.6'
+    id 'org.springframework.boot' version '3.5.14'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -19,25 +19,33 @@ repositories {
 
 dependencies {
 
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-
-    implementation 'com.itextpdf:itext7-core:8.0.5'
-    implementation 'com.google.zxing:core:3.5.3'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'com.itextpdf:itextpdf:5.5.13.3'  
-    implementation 'com.google.zxing:core:3.5.3'
-    implementation 'com.google.zxing:javase:3.5.3'   
-    implementation 'com.itextpdf:itext7-core:8.0.5'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
-runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
-runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
-    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+    implementation 'com.itextpdf:itext7-core:8.0.5'
+    implementation 'com.google.zxing:core:3.5.3'
+    implementation 'com.google.zxing:javase:3.5.3'
+
+    implementation 'com.itextpdf:itextpdf:5.5.13.3'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.21.4'
+implementation 'com.fasterxml.jackson.core:jackson-databind:2.21.6'
+
+implementation 'org.apache.httpcomponents.core5:httpcore5:5.4.3'
+implementation 'org.apache.httpcomponents.core5:httpcore5-h2:5.4.3'
+
+implementation 'org.apache.tomcat.embed:tomcat-embed-core:10.1.55'
+
+implementation 'org.springframework.data:spring-data-commons:3.5.12'
+implementation 'org.springframework:spring-expression:6.2.19'
+implementation 'org.springframework:spring-webmvc:6.2.19'
+
+    runtimeOnly 'org.postgresql:postgresql:42.7.12'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -48,4 +56,3 @@ runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 tasks.named('test') {
     useJUnitPlatform()
 }
-
