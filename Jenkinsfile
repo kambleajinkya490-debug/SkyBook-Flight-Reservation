@@ -30,6 +30,24 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'sonar-scanner'
+
+                    withSonarQubeEnv('SkyBook-SonarQube') {
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=SkyBook \
+                            -Dsonar.projectName="SkyBook Flight Reservation" \
+                            -Dsonar.sources=backend/src,frontend/src \
+                            -Dsonar.sourceEncoding=UTF-8
+                        """
+                    }
+                }
+            }
+        }
+
         stage('Docker Login to ECR') {
             steps {
                 sh '''
@@ -135,16 +153,26 @@ pipeline {
 
         success {
             echo '''
-              SKYBOOK CI/CD SUCCESS 
-              ECR PUSH SUCCESS 
-              EKS DEPLOYMENT SUCCESS 
+            ==========================================
+              SKYBOOK DEVSECOPS PIPELINE SUCCESS 🚀
+            ==========================================
+              Backend Build        ✅
+              SonarQube Analysis   ✅
+              Docker Build         ✅
+              ECR Push             ✅
+              EKS Deployment       ✅
+              Deployment Verify    ✅
+            ==========================================
             '''
         }
 
         failure {
             echo '''
-
-              SKYBOOK PIPELINE FAILED 
+            ==========================================
+              SKYBOOK PIPELINE FAILED ❌
+            ==========================================
+              Check Jenkins Console Output
+            ==========================================
             '''
         }
     }
