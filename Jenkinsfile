@@ -6,6 +6,7 @@ pipeline {
         ECR_BACKEND = '060516714221.dkr.ecr.ap-south-1.amazonaws.com/skybook-backend'
         ECR_FRONTEND = '060516714221.dkr.ecr.ap-south-1.amazonaws.com/skybook-frontend'
         EKS_CLUSTER = 'SkyBook-EKS'
+        TRIVY_CACHE = '/var/lib/trivy'
     }
 
     stages {
@@ -50,7 +51,11 @@ pipeline {
         stage('Trivy File System Scan') {
             steps {
                 sh '''
-                    trivy fs --severity HIGH,CRITICAL --exit-code 1 .
+                    trivy fs \
+                    --cache-dir $TRIVY_CACHE \
+                    --severity HIGH,CRITICAL \
+                    --exit-code 1 \
+                    .
                 '''
             }
         }
@@ -69,7 +74,9 @@ pipeline {
         stage('Build Backend Docker Image') {
             steps {
                 sh '''
-                    docker build -t $ECR_BACKEND:latest ./backend
+                    docker build \
+                    -t $ECR_BACKEND:latest \
+                    ./backend
                 '''
             }
         }
@@ -77,7 +84,9 @@ pipeline {
         stage('Build Frontend Docker Image') {
             steps {
                 sh '''
-                    docker build -t $ECR_FRONTEND:latest ./frontend
+                    docker build \
+                    -t $ECR_FRONTEND:latest \
+                    ./frontend
                 '''
             }
         }
@@ -85,7 +94,11 @@ pipeline {
         stage('Trivy Backend Image Scan') {
             steps {
                 sh '''
-                    trivy image --severity HIGH,CRITICAL --exit-code 1 $ECR_BACKEND:latest
+                    trivy image \
+                    --cache-dir $TRIVY_CACHE \
+                    --severity HIGH,CRITICAL \
+                    --exit-code 1 \
+                    $ECR_BACKEND:latest
                 '''
             }
         }
@@ -93,7 +106,11 @@ pipeline {
         stage('Trivy Frontend Image Scan') {
             steps {
                 sh '''
-                    trivy image --severity HIGH,CRITICAL --exit-code 1 $ECR_FRONTEND:latest
+                    trivy image \
+                    --cache-dir $TRIVY_CACHE \
+                    --severity HIGH,CRITICAL \
+                    --exit-code 1 \
+                    $ECR_FRONTEND:latest
                 '''
             }
         }
@@ -151,8 +168,13 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 sh '''
+                    echo "===== PODS ====="
                     kubectl get pods
+
+                    echo "===== SERVICES ====="
                     kubectl get services
+
+                    echo "===== INGRESS ====="
                     kubectl get ingress
                 '''
             }
